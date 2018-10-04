@@ -57,17 +57,5 @@ There are 465 distinct stations;
 84 stations are ADA compliant;
 43.43% of station entrances / exits without vending allow entrance.
 
-```{r p1.3}
-a_train = p1_nyc %>% 
-  filter(route_name=='A') %>% 
-  distinct(station_name,line)
-nrow(a_train)
 
-a_ada = p1_nyc %>% 
-  filter(route_name=='A' & ada==TRUE) %>% 
-  distinct(station_name,line)
-nrow(a_ada)
-```
 
-60 distinct stations serve the A train;
-of the stations that serve the A train, 17 are ADA compliant.
