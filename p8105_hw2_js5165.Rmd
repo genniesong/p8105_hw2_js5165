@@ -76,7 +76,7 @@ of the stations that serve the A train, 17 are ADA compliant.
 ## Problem 2
 
 ```{r p2.1}
-p2_trash = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = 'Mr. Trash Wheel',range = cell_cols("A:N"))%>%
+p2_trash = read_excel(path = './data/HealthyHarborWaterWheelTotals2018-7-28.xlsx',sheet = 'Mr. Trash Wheel',range = cell_cols("A:N"))%>%
   janitor::clean_names()%>%
   filter(!is.na(date))%>%
   mutate(sports_balls=as.integer(signif(sports_balls)))
@@ -84,11 +84,11 @@ p2_trash = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx
 
 
 ```{r p2.2}
-p2_2016 = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = '2016 Precipitation',range = cell_rows(2:14))%>%
+p2_2016 = read_excel(path = './data/HealthyHarborWaterWheelTotals2018-7-28.xlsx',sheet = '2016 Precipitation',range = cell_rows(2:14))%>%
   janitor::clean_names()%>%
   mutate(year=2016)
 
-p2_2017 = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = '2017 Precipitation',range = cell_rows(2:10))%>%
+p2_2017 = read_excel(path = './data/HealthyHarborWaterWheelTotals2018-7-28.xlsx',sheet = '2017 Precipitation',range = cell_rows(2:14))%>%
   janitor::clean_names()%>%
   mutate(year=2017)
 
@@ -110,8 +110,8 @@ the median number of sports balls in a dumpster in 2016 is `r p2_trash %>% filte
 devtools::install_github("p8105/p8105.datasets")
 library(p8105.datasets)
 
-p3_brfsm=brfss_smart2010%>% 
-  janitor::clean_names()%>%
+p3_brfsm=brfss_smart2010 %>% 
+  janitor::clean_names() %>%
   separate(locationdesc, into = c("state", "county"), sep = " - ") %>%
   filter(topic=='Overall Health')%>%
   select(-class,-topic,-question,-sample_size,-locationabbr,-(confidence_limit_low:geo_location))%>%
@@ -121,3 +121,43 @@ p3_brfsm=brfss_smart2010%>%
   mutate(above_good=excellent+very_good)
 
 ```
+
+
+```{r p3.2}
+nrow(distinct(p3_brfsm,state,county))
+
+nrow(distinct(p3_brfsm,state))
+
+count(p3_brfsm,state)%>%
+  arrange(-n)%>%
+  head(1)
+
+p3_brfsm%>%
+  filter(year==2002, !is.na(excellent)) %>% 
+  pull(excellent) %>% 
+  median()
+
+p3_brfsm%>%
+  filter(year==2002)%>%
+  ggplot(aes(x = excellent))+ 
+  geom_histogram()+
+  labs(
+    title = '"Excellent" response values in 2002',
+    x = 'Proportion of "Excellent"'
+  )
+
+p3_brfsm%>%
+  filter(county =='New York County' | county == 'Queens County')%>%
+  ggplot(aes(x = year, y = excellent))+ 
+  geom_point(aes(color = county))+
+  labs(
+    title = '“Excellent” response in 2 counties',
+    x = 'Proportion of "Excellent"'
+  )
+```
+
+404 unique locations are included in the dataset;
+All states are represented;
+NJ is the state observed the most (146)
+In 2002, the median of the “Excellent” response value is 23.6.
+
