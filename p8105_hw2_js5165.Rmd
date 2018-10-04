@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -72,5 +73,35 @@ nrow(a_ada)
 60 distinct stations serve the A train;
 of the stations that serve the A train, 17 are ADA compliant.
 
+## Problem 2
+
+```{r p2.1}
+p2_trash = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = 'Mr. Trash Wheel',range = cell_cols("A:N"))%>%
+  janitor::clean_names()%>%
+  filter(!is.na(date))%>%
+  mutate(sports_balls=as.integer(signif(sports_balls)))
+```
+
+
+```{r p2.2}
+p2_2016 = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = '2016 Precipitation',range = cell_rows(2:14))%>%
+  janitor::clean_names()%>%
+  mutate(year=2016)
+
+p2_2017 = read_excel(path = './data/HealthyHarborWaterWheelTotals2017-9-26.xlsx',sheet = '2017 Precipitation',range = cell_rows(2:10))%>%
+  janitor::clean_names()%>%
+  mutate(year=2017)
+
+p2_1617=bind_rows(p2_2016,p2_2017)%>%
+  janitor::clean_names()%>%
+  select(year, everything())%>%
+  mutate(month=month.name[month])
+
+```
+
+The dataset Mr. Trash Wheel has `r nrow(p2_trash)` observations, the key variable is weight_tons.
+The dataset for year 2016-2017 precipitation has `r nrow(p2_1617)` observations; the key variable is total precipitation for each month.
+The total precipitation in 2017 is `r sum(p2_2017$total)`;
+the median number of sports balls in a dumpster in 2016 is `r p2_trash %>% filter(year==2016,!is.na(sports_balls)) %>% pull(sports_balls) %>% median()`.
 
 
