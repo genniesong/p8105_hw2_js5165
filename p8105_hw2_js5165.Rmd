@@ -104,4 +104,20 @@ The dataset for year 2016-2017 precipitation has `r nrow(p2_1617)` observations;
 The total precipitation in 2017 is `r sum(p2_2017$total)`;
 the median number of sports balls in a dumpster in 2016 is `r p2_trash %>% filter(year==2016,!is.na(sports_balls)) %>% pull(sports_balls) %>% median()`.
 
+## Problem 3
 
+```{r p3.1}
+devtools::install_github("p8105/p8105.datasets")
+library(p8105.datasets)
+
+p3_brfsm=brfss_smart2010%>% 
+  janitor::clean_names()%>%
+  separate(locationdesc, into = c("state", "county"), sep = " - ") %>%
+  filter(topic=='Overall Health')%>%
+  select(-class,-topic,-question,-sample_size,-locationabbr,-(confidence_limit_low:geo_location))%>%
+  spread(key = response, value = data_value)%>%
+  janitor::clean_names()%>%
+  select(year,state,county,excellent,very_good,good,fair,poor)%>%
+  mutate(above_good=excellent+very_good)
+
+```
